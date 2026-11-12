@@ -759,30 +759,27 @@ function makeDb(){
   };
 }
 
-/* ---------- aanmelden met een code per mail ---------- */
+/* ---------- aanmelden met mailadres en wachtwoord ---------- */
 S.authed=false;
 function loginHTML(){
-  const step=S.loginStep||"mail";
   return `<section class="login"><h2>Aanmelden</h2>
-    ${step==="mail"?`<p class="small" style="margin:0">Vul je mailadres in. Je krijgt een mail met een code van 6 cijfers.</p>
-      <form id="loginMail" class="loginform"><label class="f">Mailadres<input id="l-mail" type="email" required autocomplete="email" inputmode="email" value="${esc(S.loginMail||"")}"></label><button class="btn primary" type="submit">Stuur code</button></form>`
-    :`<p class="small" style="margin:0">Code gestuurd naar <b>${esc(S.loginMail)}</b>. Kijk ook in je spam.</p>
-      <form id="loginCode" class="loginform"><label class="f">Code<input id="l-code" type="text" required inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="123456"></label><button class="btn primary" type="submit">Aanmelden</button><button class="btn" type="button" id="l-back">Ander mailadres</button></form>`}
+    <p class="small" style="margin:0">Meld je één keer aan. Daarna blijf je aangemeld op deze gsm.</p>
+    <form id="loginForm" class="loginform">
+      <label class="f">Mailadres<input id="l-mail" type="email" required autocomplete="username" inputmode="email"></label>
+      <label class="f">Wachtwoord<input id="l-pass" type="password" required autocomplete="current-password"></label>
+      <button class="btn primary" type="submit">Aanmelden</button>
+    </form>
+    <p class="small" style="margin:0">Wachtwoord vergeten? Noa kan het opnieuw instellen in Supabase.</p>
   </section>`;
 }
 function bindLogin(){
-  const fm=$("#loginMail"), fc=$("#loginCode");
-  if(fm) fm.addEventListener("submit",async e=>{ e.preventDefault(); const mail=$("#l-mail").value.trim().toLowerCase(); if(!mail) return;
-    const b=fm.querySelector("button"); b.disabled=true; b.textContent="Bezig…";
-    const {error}=await sb.auth.signInWithOtp({email:mail,options:{shouldCreateUser:true}});
-    if(error){ b.disabled=false; b.textContent="Stuur code"; setNote("De code versturen lukte niet: "+error.message); return; }
-    setNote(""); S.loginMail=mail; S.loginStep="code"; render(); });
-  if(fc) fc.addEventListener("submit",async e=>{ e.preventDefault(); const token=$("#l-code").value.replace(/\s/g,""); if(!token) return;
-    const b=fc.querySelector("button"); b.disabled=true; b.textContent="Bezig…";
-    const {data,error}=await sb.auth.verifyOtp({email:S.loginMail,token,type:"email"});
-    if(error){ b.disabled=false; b.textContent="Aanmelden"; setNote("Die code klopt niet of is verlopen. Probeer opnieuw."); return; }
+  const f=$("#loginForm"); if(!f) return;
+  f.addEventListener("submit",async e=>{ e.preventDefault();
+    const email=$("#l-mail").value.trim().toLowerCase(), password=$("#l-pass").value;
+    const b=f.querySelector("button"); b.disabled=true; b.textContent="Bezig…";
+    const {data,error}=await sb.auth.signInWithPassword({email,password});
+    if(error){ b.disabled=false; b.textContent="Aanmelden"; setNote("Aanmelden lukte niet. Kijk je mailadres en wachtwoord na."); return; }
     setNote(""); start(data.session); });
-  const back=$("#l-back"); if(back) back.onclick=()=>{ S.loginStep="mail"; render(); };
 }
 async function logout(){ try{ await sb.auth.signOut(); }catch(e){} location.reload(); }
 

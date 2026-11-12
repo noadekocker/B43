@@ -27,14 +27,14 @@ Live: **https://noadekocker.github.io/B43/**
 
 - De app staat op **GitHub Pages**.
 - De gegevens (taken en planten) staan in **Supabase** (gratis database, regio EU). Beide gsm's zien wijzigingen meteen.
-- **Aanmelden** gebeurt met je mailadres: je krijgt een code van 6 cijfers per mail. Alleen de mailadressen in de tabel `members` krijgen toegang.
+- **Aanmelden** gebeurt met mailadres en wachtwoord (gebruikers aangemaakt in Supabase > Authentication > Users). Er worden geen mails verstuurd. Alleen de mailadressen in de tabel `members` krijgen toegang tot de gegevens.
 - De Supabase-sleutel in `index.html` is de publieke ("publishable") sleutel. Die mag in de code staan: de beveiliging (row level security) laat alleen leden toe.
 
 ## Installeren op de gsm
 
 1. Open **https://noadekocker.github.io/B43/** in Safari (iPhone) of Chrome (Android).
 2. iPhone: **Deel → Zet op beginscherm**. Android: **⋮ → Toevoegen aan startscherm**.
-3. Open de app via de bloem en meld je aan met je mailadres en de code.
+3. Open de app via de bloem en meld je één keer aan met je mailadres en wachtwoord.
 
 ## Stijl
 
