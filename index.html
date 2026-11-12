@@ -594,7 +594,7 @@ function viewTaken(){
   h+=`<div class="mstrip" role="group" aria-label="Kies een maand"><button type="button" class="mday ${!wm?"on":""}" data-act="wmonth" data-m="" aria-pressed="${!wm}"><span class="mname">alle</span><span class="mnum">${openAll.length}</span></button>${months.map(x=>{const n=openAll.filter(t=>inMonth(t,x)).length;return `<button type="button" class="mday ${x===wm?"on":""}" data-act="wmonth" data-m="${x}" aria-pressed="${x===wm}"><span class="mname">${mLabel(x)}</span><span class="mnum">${n}</span></button>`}).join("")}</div>`;
   h+=`<div class="filters">${[["open","Te doen"],["klaar","Klaar"]].map(([k,l])=>`<button class="pill" type="button" data-act="filter" data-f="${k}" aria-pressed="${f===k}">${l}</button>`).join("")}<select class="pill" id="zoneFilter" aria-label="Filter op zone"><option value="">Alle zones</option>${ZONES.map(z=>`<option value="${z.id}" ${zf===z.id?"selected":""}>${esc(z.name)}</option>`).join("")}</select></div>`;
   h+=rows(ts, f==="klaar"?"Nog niets klaar.":"Niets te doen met deze keuze.");
-  if(sb) h+=`<p class="small" style="margin:8px 0 0">Aangemeld als ${esc(S.me||"")} · <button type="button" class="linkbtn" data-act="logout">Afmelden</button></p>`;
+  if(sb) h+=`<p class="small" style="margin:8px 0 0">Aangemeld als ${esc(S.me||"")} · <button type="button" class="linkbtn" data-act="pw">Wachtwoord wijzigen</button> · <button type="button" class="linkbtn" data-act="logout">Afmelden</button></p>`;
   return h;
 }
 const TITLES={nu:"",kaart:"Tuin",taken:"Werken",planten:"Planten"};
@@ -707,6 +707,7 @@ document.addEventListener("click",e=>{
   else if(a==="deltask") confirmSheet("Deze taak verwijderen?","Verwijderen",()=>db.doc("tasks/"+id).delete());
 
   else if(a==="logout") logout();
+  else if(a==="pw") pwForm();
   else if(a==="filter"){ S.filter=el.dataset.f; render(); }
   else if(a==="pfilter"){ S.pfilter=el.dataset.f; render(); }
   else if(a==="plant") plantDetail(id);
@@ -780,6 +781,21 @@ function bindLogin(){
     const {data,error}=await sb.auth.signInWithPassword({email,password});
     if(error){ b.disabled=false; b.textContent="Aanmelden"; setNote("Aanmelden lukte niet. Kijk je mailadres en wachtwoord na."); return; }
     setNote(""); start(data.session); });
+}
+function pwForm(){
+  openSheet(`<div class="bar-top"><h3>Wachtwoord wijzigen</h3><button class="x" type="button" data-act="close" aria-label="Sluiten">${hand("kruis")}</button></div>
+  <form id="pwForm" style="display:flex;flex-direction:column;gap:14px">
+    <label class="f">Nieuw wachtwoord <span class="h">Minstens 8 tekens</span><input id="pw1" type="password" required minlength="8" autocomplete="new-password"></label>
+    <label class="f">Nog eens<input id="pw2" type="password" required minlength="8" autocomplete="new-password"></label>
+    <button class="btn primary" type="submit">Bewaren</button>
+  </form>`);
+  $("#pwForm").addEventListener("submit",async e=>{ e.preventDefault();
+    const a=$("#pw1").value, b=$("#pw2").value;
+    if(a!==b){ toast("De twee wachtwoorden zijn niet hetzelfde."); return; }
+    const btn=e.target.querySelector("button"); btn.disabled=true;
+    const {error}=await sb.auth.updateUser({password:a});
+    if(error){ btn.disabled=false; toast("Wijzigen lukte niet. Probeer een langer wachtwoord."); return; }
+    closeSheet(); toast("Je nieuwe wachtwoord is bewaard."); });
 }
 async function logout(){ try{ await sb.auth.signOut(); }catch(e){} location.reload(); }
 
