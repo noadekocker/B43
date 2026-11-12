@@ -196,6 +196,12 @@ nav.tabs{position:relative;left:auto;right:auto;bottom:auto;flex:none}
 .loginform{display:flex;flex-direction:column;gap:12px}
 .linkbtn{border:0;background:none;padding:0;color:var(--woud);text-decoration:underline;font:inherit;font-size:inherit}
 nav.tabs[hidden]{display:none}
+/* iPhone: maand- en datumvelden niet breder dan het scherm */
+.two{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+label.f{min-width:0}
+.f input[type="month"],.f input[type="date"]{-webkit-appearance:none;appearance:none;display:block;width:100%;max-width:100%;min-width:0;min-height:46px;text-align:left;background:var(--wit)}
+.f input::-webkit-date-and-time-value{text-align:left}
+.sheet{overflow-x:hidden}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
 </head>
