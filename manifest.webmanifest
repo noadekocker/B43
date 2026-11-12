@@ -1,0 +1,13 @@
+{
+ "name": "B43 – Lekker tuinen",
+ "short_name": "B43",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "background_color": "#FFF9EF",
+ "theme_color": "#FFF9EF",
+ "icons": [
+  {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+  {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+ ]
+}
