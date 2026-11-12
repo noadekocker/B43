@@ -19,24 +19,29 @@ create table if not exists public.plants (
   updated_at timestamptz not null default now()
 );
 
--- 3. Beveiliging: alleen leden (Noa en Jacob) mogen lezen en schrijven
-create or replace function public.is_member() returns boolean
+-- 3. Beveiliging: alleen leden mogen lezen en schrijven
+-- De controle staat in een apart schema "private", zodat ze niet via de API aan te roepen is.
+create schema if not exists private;
+grant usage on schema private to authenticated;
+create or replace function private.is_member() returns boolean
 language sql stable security definer set search_path = public as $$
   select exists (select 1 from public.members m where lower(m.email) = lower(auth.jwt() ->> 'email'));
 $$;
+revoke all on function private.is_member() from public, anon;
+grant execute on function private.is_member() to authenticated;
 
 alter table public.members enable row level security;
 alter table public.tasks   enable row level security;
 alter table public.plants  enable row level security;
 
 drop policy if exists "leden lezen leden" on public.members;
-create policy "leden lezen leden" on public.members for select to authenticated using (public.is_member());
+create policy "leden lezen leden" on public.members for select to authenticated using (private.is_member());
 
 drop policy if exists "leden beheren taken" on public.tasks;
-create policy "leden beheren taken" on public.tasks for all to authenticated using (public.is_member()) with check (public.is_member());
+create policy "leden beheren taken" on public.tasks for all to authenticated using (private.is_member()) with check (private.is_member());
 
 drop policy if exists "leden beheren planten" on public.plants;
-create policy "leden beheren planten" on public.plants for all to authenticated using (public.is_member()) with check (public.is_member());
+create policy "leden beheren planten" on public.plants for all to authenticated using (private.is_member()) with check (private.is_member());
 
 -- 4. Live bijwerken op beide gsm's
 do $$ begin

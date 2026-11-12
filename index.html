@@ -727,8 +727,8 @@ function route(){ const h=location.hash.replace("#",""); S.view=(h in TITLES)?h:
 window.addEventListener("hashchange",route);
 
 /* ---------- opslag: Supabase (gedeeld tussen Noa en Jacob) ---------- */
-const SB_URL="__SUPABASE_URL__";
-const SB_KEY="__SUPABASE_PUBLISHABLE_KEY__";
+const SB_URL="https://zkfprquciovekcbxbqks.supabase.co";
+const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprZnBycXVjaW92ZWtjYnhicWtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ0ODUwOTUsImV4cCI6MjExMDA2MTA5NX0.bfBp_8wqKpQ7rroZKzG_VuIicbiuJ9pUOJsbRBDr8s8"; // publieke sleutel, beveiliging zit in de database
 let sb=null;
 function makeDb(){
   const subs={tasks:[],plants:[]}, cache={tasks:[],plants:[]};
